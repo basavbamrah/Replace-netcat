@@ -6,7 +6,7 @@ import subprocess
 import sys
 import textwrap
 import threading
-from urllib import response
+# from urllib import response
 
 
 class NetCat:
@@ -17,27 +17,22 @@ class NetCat:
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def run(self):
-        print('ok')
+        # print('ok')
         if self.args.listen:
-            print('ok')
+            # print('ok')
             self.listen()
         else:
-            print('ok')
+            # print('ok')
             self.send()
 
     def send(self):
         self.socket.connect((self.args.target, self.args.port))
-        print('ok')
+        # print('ok')
 
-        if self.buffer=='end'.encode():
-            print('ok')
-            buffer = ''
-        else:
-            print('ok')
+        if self.buffer:
             # check buffer if there is something then send it first
             self.socket.send(self.buffer)
-            print(self.buffer)
-
+            # print(self.buffer)
 
         try:
             while True:
@@ -51,7 +46,19 @@ class NetCat:
                         break
                 if response:
                     print(response)  # print the response
-                    buffer = input('> ')  # wait for input
+                    # print('ok')
+                    sys.stdin.flush()
+                    # a = 
+                    # flush_input()
+                    sys.stdout.flush()
+                    buffer = sys.stdin.read()
+                    try:
+                        a=input()
+                    except:
+                        pass
+                    # import os
+                    # os.system('clear')
+                    buffer = input('>')  # wait for input
                     buffer += '\n'
                     self.socket.send(buffer.encode())
         except KeyboardInterrupt:
@@ -60,18 +67,19 @@ class NetCat:
             sys.exit()
 
     def listen(self):
-        print("ok")
+        # print("ok")
         self.socket.bind((self.args.target, self.args.port))
         self.socket.listen(5)
-        print("ok")
+        # print("ok")
         while True:
             client_socket, _ = self.socket.accept()
             print(_)
-            client_thread = threading.Thread(target=self.handle, args=(client_socket,))
+            client_thread = threading.Thread(
+                target=self.handle, args=(client_socket,))
             client_thread.start()
 
     def handle(self, client_socket):
-        print('Handle')
+        # print('Handle')
         if self.args.execute:
             output = execute(self.args.execute)
             client_socket.send(output)
@@ -117,9 +125,19 @@ def execute(cmd):
     return output.decode()
 
 
+def flush_input():
+    try:
+        import msvcrt
+        while msvcrt.kbhit():
+            msvcrt.getch()
+    except ImportError:
+        import sys
+        from termios import tcflush, TCIOFLUSH  # for linux/unix
+        tcflush(sys.stdin, TCIOFLUSH)
+
 if __name__ == '__main__':
     # use the argparse module from the standard library to create a commanf line interface
-    print('yes')
+    # print('yes')
     parser = argparse.ArgumentParser(
         description='Net Tool',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -146,7 +164,7 @@ if __name__ == '__main__':
     if args.listen:
         buffer = ''
     else:
-        sys.stdin.flush()
+        # sys.stdin.flush()
         buffer = sys.stdin.read()
         # buffer="end"
 
